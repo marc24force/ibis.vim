@@ -1,3 +1,0 @@
-[submodule "imapclient"]
-	path = imapclient
-	url = https://github.com/mjs/imapclient.git
