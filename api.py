@@ -56,8 +56,11 @@ def get_emails(last_seq, chunk_size):
         subject = decode_byte(envelope.subject)
         from_ = envelope.from_[0]
         from_ = "@".join([decode_byte(from_.mailbox), decode_byte(from_.host)])
-        to = envelope.to[0]
-        to = "@".join([decode_byte(to.mailbox), decode_byte(to.host)])
+        if envelope.to is None:
+            to = ""
+        else:
+            to = envelope.to[0]
+            to = "@".join([decode_byte(to.mailbox), decode_byte(to.host)])
         date_ = data[b"INTERNALDATE"].strftime("%d/%m/%y, %Hh%M")
 
         email = dict()
@@ -151,6 +154,9 @@ def write_preview(payload, uid, subtype="html"):
     return preview
 
 def decode_byte(byte):
+    if byte is None:
+        return ""
+
     decode_list = decode_header(byte.decode())
 
     def _decode_byte(byte_or_str, encoding):
