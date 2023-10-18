@@ -1,4 +1,4 @@
-function! iris#utils#pipe(...)
+function! ibis#utils#pipe(...)
   let funcs = map(copy(a:000), "function(v:val)")
   return function("s:pipe", [funcs])
 endfunction
@@ -13,8 +13,8 @@ function! s:pipe(funcs, arg)
   return data
 endfunction
 
-function! iris#utils#trim(str)
-  return iris#utils#pipe("s:trim_left", "s:trim_right")(a:str)
+function! ibis#utils#trim(str)
+  return ibis#utils#pipe("s:trim_left", "s:trim_right")(a:str)
 endfunction
 
 function! s:trim_left(str)
@@ -25,7 +25,7 @@ function! s:trim_right(str)
   return substitute(a:str, '\s*$', "", "g")
 endfunction
 
-function! iris#utils#assign(...)
+function! ibis#utils#assign(...)
   let overrides = copy(a:000)
   let base = remove(overrides, 0)
 
@@ -39,7 +39,7 @@ function! iris#utils#assign(...)
   return base
 endfunction
 
-function! iris#utils#sum(array)
+function! ibis#utils#sum(array)
   let total = 0
 
   for item in a:array
@@ -49,19 +49,19 @@ function! iris#utils#sum(array)
   return total
 endfunction
 
-function! iris#utils#log(msg)
-  let msg = printf("Iris: %s", a:msg)
+function! ibis#utils#log(msg)
+  let msg = printf("Ibis: %s", a:msg)
   redraw | echom msg
 endfunction
 
-function! iris#utils#elog(msg)
-  let msg = printf("Iris: %s", a:msg)
+function! ibis#utils#elog(msg)
+  let msg = printf("Ibis: %s", a:msg)
   redraw | echohl ErrorMsg | echom msg | echohl None
 endfunction
 
-function! iris#utils#define_maps(maps)
+function! ibis#utils#define_maps(maps)
   for [mode, key, plug] in a:maps
-    let plug = printf("<plug>(iris-%s)", plug)
+    let plug = printf("<plug>(ibis-%s)", plug)
 
     if !hasmapto(plug, mode)
       execute printf("%smap <nowait> <buffer> %s %s", mode, key, plug)

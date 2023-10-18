@@ -2,8 +2,8 @@ let s:dir = expand("<sfile>:h:h:h")
 let s:path = resolve(s:dir . "/idle.py")
 let s:job = v:null
 
-function! iris#idle#start()
-  let s:job = iris#job#start(s:path, function("s:handle_data"))
+function! ibis#idle#start()
+  let s:job = ibis#job#start(s:path, function("s:handle_data"))
 endfunction
 
 function! s:handle_data(data_raw)
@@ -11,21 +11,21 @@ function! s:handle_data(data_raw)
   let data = json_decode(a:data_raw)
 
   if !data.success
-    return iris#utils#elog("idle: " . string(data.error))
+    return ibis#utils#elog("idle: " . string(data.error))
   endif
 endfunction
 
 function! s:send(data)
-  call iris#job#send(s:job, a:data)
+  call ibis#job#send(s:job, a:data)
 endfunction
 
-function! iris#idle#login(passwd)
+function! ibis#idle#login(passwd)
   call s:send({
     \"type": "login",
-    \"imap-host": g:iris_imap_host,
-    \"imap-port": g:iris_imap_port,
-    \"imap-login": g:iris_imap_login,
+    \"imap-host": g:ibis_imap_host,
+    \"imap-port": g:ibis_imap_port,
+    \"imap-login": g:ibis_imap_login,
     \"imap-passwd": a:passwd,
-    \"idle-timeout": g:iris_idle_timeout,
+    \"idle-timeout": g:ibis_idle_timeout,
   \})
 endfunction

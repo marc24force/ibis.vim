@@ -1,6 +1,6 @@
 let s:curr_data = ""
 
-function! iris#job#neovim#start(script, handle_data)
+function! ibis#job#neovim#start(script, handle_data)
   let cmd = printf("python3 '%s'", a:script)
   let opts = {
     \"on_stdout": {_, data, __ -> s:handle_data(data, a:handle_data)},
@@ -11,7 +11,7 @@ endfunction
 
 function! s:handle_data(raw_data_list, handler)
   let curr_list = a:raw_data_list
-  if empty(curr_list) | return iris#job#close() | endif
+  if empty(curr_list) | return ibis#job#close() | endif
 
   while 1
     let eof = index(curr_list, "")
@@ -29,7 +29,7 @@ function! s:handle_data(raw_data_list, handler)
   endwhile
 endfunction
 
-function! iris#job#neovim#send(job, data)
+function! ibis#job#neovim#send(job, data)
   if a:job == 0 | return | endif
   return chansend(a:job, json_encode(a:data) . "\n")
 endfunction

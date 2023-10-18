@@ -1,26 +1,26 @@
-*iris.txt* - 📫 Simple mail client for Vim.
+*ibis.txt* - 📫 Simple mail client for Vim.
 
                 _/_/_/       _/_/_/        _/_/_/         _/_/_/               
                  _/         _/    _/        _/         _/                      
                 _/         _/_/_/          _/           _/_/                   
                _/         _/    _/        _/               _/                  
-            _/_/_/       _/    _/      _/_/_/       _/_/_/                     
+            _/_/_/       _/_/_/        _/_/_/       _/_/_/                     
 
 ==============================================================================
-TABLE OF CONTENTS                                              *iris-contents*
+TABLE OF CONTENTS                                              *ibis-contents*
 
-  Motivation .......................................................... |iris|
-  License ..................................................... |iris-license|
-  Contributing ........................................... |iris-contributing|
-  Credits ..................................................... |iris-credits|
+  Motivation .......................................................... |ibis|
+  License ..................................................... |ibis-license|
+  Contributing ........................................... |ibis-contributing|
+  Credits ..................................................... |ibis-credits|
 
 ==============================================================================
-MOTIVATION                                                              *iris*
+MOTIVATION                                                              *ibis*
 
 (Neo)Mutt and Alpine are very good terminal mail clients, but they lack of Vim
 mappings. You can emulate, but it requires a lot of time, patience and
 configuration. Why trying to emulate, when you can have it in Vim? VimL and
-Python are strong enough to do so. The aim of Iris is to provide a simple mail
+Python are strong enough to do so. The aim of Ibis is to provide a simple mail
 client that:
 
   - Allows you to manage your mails inside Vim
@@ -31,7 +31,7 @@ client that:
                                          https://github.com/mjs/imapclient {1}
 
 ==============================================================================
-LICENSE                                                         *iris-license*
+LICENSE                                                         *ibis-license*
 
 MIT License
 
@@ -56,10 +56,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 ==============================================================================
-CONTRIBUTING                                               *iris-contributing*
+CONTRIBUTING                                               *ibis-contributing*
 
-Report any bugs here: https://github.com/soywod/iris.vim/issues
-Feel free to submit pull requests: https://github.com/soywod/iris.vim/pulls
+Report any bugs here: https://github.com/soywod/ibis.vim/issues
+Feel free to submit pull requests: https://github.com/soywod/ibis.vim/pulls
 
 1) Git commit messages follow the Angular Convention{1}, but contain only a
 subject.
@@ -78,7 +78,7 @@ before proposing a pull request.
                 https://gist.github.com/stephenparish/9941e89d80e2bc58a153 {1}
 
 ==============================================================================
-CREDITS                                                         *iris-credits*
+CREDITS                                                         *ibis-credits*
 
   - `Mutt` {1}, a terminal mail client 
   - `NeoMutt` {2}, the successor of Mutt

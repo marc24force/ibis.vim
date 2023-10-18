@@ -8,7 +8,7 @@ import sys
 
 from imapclient.imapclient import IMAPClient
 
-log_filename = os.path.join(os.path.dirname(os.path.realpath(__file__)), "iris-idle.log")
+log_filename = os.path.join(os.path.dirname(os.path.realpath(__file__)), "ibis-idle.log")
 logging.basicConfig(filename=log_filename, format="[%(asctime)s] %(message)s", level=logging.INFO, datefmt="%Y-%m-%d %H:%M:%S")
 
 request_raw = sys.stdin.readline()
@@ -27,7 +27,7 @@ imap.select_folder("INBOX")
 imap.idle()
 
 def notify_new_mail():
-    title = "Iris"
+    title = "Ibis"
     msg = "New mail available!"
 
     if sys.platform == "darwin":

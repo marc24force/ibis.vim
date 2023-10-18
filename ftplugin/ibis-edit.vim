@@ -25,13 +25,13 @@ setlocal nowrap
 setlocal omnifunc=IrisContactsComplete
 setlocal startofline
 
-nnoremap <silent> <plug>(iris-send-email) :call iris#ui#send_email()<cr>
+nnoremap <silent> <plug>(ibis-send-email) :call ibis#ui#send_email()<cr>
 
-call iris#utils#define_maps([
+call ibis#utils#define_maps([
   \["n", "gs", "send-email"],
 \])
 
-augroup iris
+augroup ibis
   autocmd! * <buffer>
-  autocmd  BufWriteCmd <buffer> call iris#ui#save_email()
+  autocmd  BufWriteCmd <buffer> call ibis#ui#save_email()
 augroup end

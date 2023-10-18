@@ -28,7 +28,7 @@ Simple mail client for Vim, this work is based on [Iris.vim](https://github.com/
     - [Folders](#folders)
     - [Flags](#flags)
     - [Contacts](#contacts)
-  - [Changelog](https://github.com/soywod/iris.vim/blob/master/CHANGELOG.md)
+  - [Changelog](https://github.com/marc24force/ibis.vim/blob/master/CHANGELOG.md)
   - [Contributing](#contributing)
 
 ## Motivation

@@ -14,60 +14,60 @@ let s:config = {
   \},
 \}
 
-function! iris#ui#prompt_passwd(filepath, show_cmd, prompt)
+function! ibis#ui#prompt_passwd(filepath, show_cmd, prompt)
   if empty(a:filepath)
     if empty(a:show_cmd)
       redraw | echo
-      let prompt = "Iris: " . a:prompt . ":\n> "
-      return iris#utils#pipe("inputsecret", "iris#utils#trim")(prompt)
+      let prompt = "Ibis: " . a:prompt . ":\n> "
+      return ibis#utils#pipe("inputsecret", "ibis#utils#trim")(prompt)
     else
       return systemlist(a:show_cmd)[0]
     endif
   else
-    return systemlist(printf(g:iris_passwd_show_cmd, a:filepath))[0]
+    return systemlist(printf(g:ibis_passwd_show_cmd, a:filepath))[0]
   endif
 endfunction
 
-function! iris#ui#select_folder()
-  let folder  = iris#cache#read("folder", "INBOX")
-  let folders = iris#cache#read("folders", [])
+function! ibis#ui#select_folder()
+  let folder  = ibis#cache#read("folder", "INBOX")
+  let folders = ibis#cache#read("folders", [])
 
   if &rtp =~ "fzf.vim"
     call fzf#run({
       \"source":  folders,
-      \"sink": function("iris#api#select_folder"),
+      \"sink": function("ibis#api#select_folder"),
       \"down": "25%",
     \})
   else
     echo join(map(copy(folders), "printf('%s (%d)', v:val, v:key)"), ", ") . ": "
     let choice = nr2char(getchar())
-    call iris#api#select_folder(folders[choice])
+    call ibis#api#select_folder(folders[choice])
   endif
 endfunction
 
-function! iris#ui#list_email()
+function! ibis#ui#list_email()
   redraw | echo
-  let folder = iris#cache#read("folder", "INBOX")
-  let emails = iris#cache#read("emails", [])
+  let folder = ibis#cache#read("folder", "INBOX")
+  let emails = ibis#cache#read("emails", [])
   let template = printf("list.%s", folder == "Sent" ? "to" : "from")
 
-  silent! bdelete Iris
-  silent! edit Iris
+  silent! bdelete Ibis
+  silent! edit Ibis
 
   call append(0, s:render(template, emails))
   normal! ddgg
-  setlocal filetype=iris-list
+  setlocal filetype=ibis-list
 endfunction
 
-function! iris#ui#preview_email(email, format)
+function! ibis#ui#preview_email(email, format)
   if a:format == "text"
     let email = substitute(a:email, "", "", "g")
 
-    silent! bdelete "Iris preview"
-    silent! edit Iris preview
+    silent! bdelete "Ibis preview"
+    silent! edit Ibis preview
     call append(0, split(email, "\n"))
     normal! ddgg
-    setlocal filetype=iris-preview
+    setlocal filetype=ibis-preview
 
   elseif a:format == "html"
     let url = a:email
@@ -75,9 +75,9 @@ function! iris#ui#preview_email(email, format)
   endif
 endfunction
 
-function! iris#ui#new_email()
-  silent! bdelete "Iris new"
-  silent! edit Iris new
+function! ibis#ui#new_email()
+  silent! bdelete "Ibis new"
+  silent! edit Ibis new
 
   call append(0, [
     \"To: ",
@@ -89,13 +89,13 @@ function! iris#ui#new_email()
 
   normal! ddgg$
 
-  setlocal filetype=iris-edit
+  setlocal filetype=ibis-edit
   let &modified = 0
 endfunction
 
-function! iris#ui#reply_email()
-  let index = iris#cache#read("email:index", 0)
-  let email = iris#cache#read("emails", [])[index]
+function! ibis#ui#reply_email()
+  let index = ibis#cache#read("email:index", 0)
+  let email = ibis#cache#read("emails", [])[index]
   let message = map(getline(1, "$"), "'>' . v:val")
 
   if empty(email["reply-to"])
@@ -104,8 +104,8 @@ function! iris#ui#reply_email()
     let reply_to = email["reply-to"]
   endif
 
-  silent! bdelete "Iris reply"
-  silent! edit Iris reply
+  silent! bdelete "Ibis reply"
+  silent! edit Ibis reply
 
   call append(0, [
     \"In-Reply-To: " . email["message-id"],
@@ -118,13 +118,13 @@ function! iris#ui#reply_email()
 
   normal! dd6G
 
-  setlocal filetype=iris-edit
+  setlocal filetype=ibis-edit
   let &modified = 0
 endfunction
 
-function! iris#ui#reply_all_email()
-  let index = iris#cache#read("email:index", 0)
-  let email = iris#cache#read("emails", [])[index]
+function! ibis#ui#reply_all_email()
+  let index = ibis#cache#read("email:index", 0)
+  let email = ibis#cache#read("emails", [])[index]
   let message = map(getline(1, "$"), "'>' . v:val")
 
   if empty(email["reply-to"])
@@ -133,8 +133,8 @@ function! iris#ui#reply_all_email()
     let reply_to = email["reply-to"]
   endif
 
-  silent! bdelete "Iris reply all"
-  silent! edit Iris reply all
+  silent! bdelete "Ibis reply all"
+  silent! edit Ibis reply all
 
   call append(0, [
     \"In-Reply-To: " . email["message-id"],
@@ -147,17 +147,17 @@ function! iris#ui#reply_all_email()
 
   normal! dd6G
 
-  setlocal filetype=iris-edit
+  setlocal filetype=ibis-edit
   let &modified = 0
 endfunction
 
-function! iris#ui#forward_email()
-  let index = iris#cache#read("email:index", 0)
-  let email = iris#cache#read("emails", [])[index]
+function! ibis#ui#forward_email()
+  let index = ibis#cache#read("email:index", 0)
+  let email = ibis#cache#read("emails", [])[index]
   let message = getline(1, "$")
 
-  silent! bdelete "Iris forward"
-  silent! edit Iris forward
+  silent! bdelete "Ibis forward"
+  silent! edit Ibis forward
 
   call append(0, [
     \"To: ",
@@ -170,19 +170,19 @@ function! iris#ui#forward_email()
 
   normal! ddgg$
 
-  setlocal filetype=iris-edit
+  setlocal filetype=ibis-edit
   let &modified = 0
 endfunction
 
-function! iris#ui#save_email()
-  call iris#cache#write("draft", getline(1, "$"))
-  call iris#utils#log("draft saved!")
+function! ibis#ui#save_email()
+  call ibis#cache#write("draft", getline(1, "$"))
+  call ibis#utils#log("draft saved!")
   let &modified = 0
 endfunction
 
-function! iris#ui#send_email()
+function! ibis#ui#send_email()
   redraw | echo
-  let draft = iris#cache#read("draft", [])
+  let draft = ibis#cache#read("draft", [])
 
   let separator_idx = index(draft, "")
 
@@ -190,19 +190,19 @@ function! iris#ui#send_email()
   for header in draft[:separator_idx-1]
     let header_split = split(header, ":")
     let key = header_split[0]
-    let val = iris#utils#trim(join(header_split[1:], ''))
+    let val = ibis#utils#trim(join(header_split[1:], ''))
     if !empty(val) | let headers[key] = val | endif
   endfor
 
   let message = join(draft[separator_idx+1:], "\r\n")
 
   silent! bdelete
-  call iris#api#send_email({
+  call ibis#api#send_email({
     \"headers": headers,
     \"message": message,
     \"from": {
-      \"name": g:iris_name,
-      \"email": g:iris_mail,
+      \"name": g:ibis_name,
+      \"email": g:ibis_mail,
     \}
   \})
 endfunction
@@ -235,7 +235,7 @@ function! s:get_max_widths(lines, columns)
     call map(max_widths, "max([widths[v:key], v:val])")
   endfor
 
-  let tbl_width = iris#utils#sum(max_widths) + len(max_widths) * 2 + 1
+  let tbl_width = ibis#utils#sum(max_widths) + len(max_widths) * 2 + 1
   let win_width = winwidth(0)
   let num_width = (&number || &relativenumber) ? &numberwidth : 0
   let diff_width = tbl_width - win_width + num_width - 1
@@ -253,7 +253,7 @@ function! s:get_max_widths(lines, columns)
 endfunction
 
 function! s:get_focused_email()
-  let emails = iris#cache#read("emails", [])
+  let emails = ibis#cache#read("emails", [])
   let index = line(".") - 2
   if  index < 0 | throw "email not found" | endif
   

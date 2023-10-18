@@ -12,11 +12,11 @@ setlocal nomodifiable
 setlocal nowrap
 setlocal startofline
 
-nnoremap <silent> <plug>(iris-reply-email)      :call iris#ui#reply_email()    <cr>
-nnoremap <silent> <plug>(iris-reply-all-email)  :call iris#ui#reply_all_email()<cr>
-nnoremap <silent> <plug>(iris-forward-email)    :call iris#ui#forward_email()  <cr>
+nnoremap <silent> <plug>(ibis-reply-email)      :call ibis#ui#reply_email()    <cr>
+nnoremap <silent> <plug>(ibis-reply-all-email)  :call ibis#ui#reply_all_email()<cr>
+nnoremap <silent> <plug>(ibis-forward-email)    :call ibis#ui#forward_email()  <cr>
 
-call iris#utils#define_maps([
+call ibis#utils#define_maps([
   \["n", "gr", "reply-email"    ],
   \["n", "gR", "reply-all-email"],
   \["n", "gf", "forward-email"  ],
