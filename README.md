@@ -71,6 +71,10 @@ differences with Iris are:
   - Python3 support enabled `:echo has("python3")`
   - Job enabled `:echo has("job")`
   - Channel enabled `:echo has("channel")`
+  - Install python library imapclient
+>```bash
+>pip install imapclient
+>```
 
 This project will be only tested on Vim8+, if you want to use it on Neovim
 I can't guarantee full functionality.
