@@ -1,10 +1,10 @@
-function! IrisThreadFold(lnum)
+function! IbisThreadFold(lnum)
   return getline(a:lnum)[0] == ">"
 endfunction
 
 setlocal buftype=nofile
 setlocal cursorline
-setlocal foldexpr=IrisThreadFold(v:lnum)
+setlocal foldexpr=IbisThreadFold(v:lnum)
 setlocal foldlevel=0
 setlocal foldlevelstart=0
 setlocal foldmethod=expr

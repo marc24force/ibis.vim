@@ -1,7 +1,7 @@
 let s:contacts_path = resolve(expand("<sfile>:h:h") . '/.contacts')
 let s:contacts = readfile(s:contacts_path)
 
-function! IrisContactsComplete(findstart, base)
+function! IbisContactsComplete(findstart, base)
   if (a:findstart == 1)
     normal b
     return col(".") - 1
@@ -10,19 +10,19 @@ function! IrisContactsComplete(findstart, base)
   endif
 endfunction
 
-function! IrisThreadFold(lnum)
+function! IbisThreadFold(lnum)
   return getline(a:lnum)[0] == ">"
 endfunction
 
 setlocal buftype=acwrite
-setlocal completefunc=IrisContactsComplete
+setlocal completefunc=IbisContactsComplete
 setlocal cursorline
-setlocal foldexpr=IrisThreadFold(v:lnum)
+setlocal foldexpr=IbisThreadFold(v:lnum)
 setlocal foldlevel=0
 setlocal foldlevelstart=0
 setlocal foldmethod=expr
 setlocal nowrap
-setlocal omnifunc=IrisContactsComplete
+setlocal omnifunc=IbisContactsComplete
 setlocal startofline
 
 nnoremap <silent> <plug>(ibis-send-email) :call ibis#ui#send_email()<cr>
