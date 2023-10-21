@@ -21,7 +21,7 @@ login = request["imap-login"]
 passwd = request["imap-passwd"]
 idle_timeout = request["idle-timeout"]
 
-imap = IMAPClient(host, port)
+imap = IMAPClient(host, port, ssl=True)
 imap.login(login, passwd)
 imap.select_folder("INBOX")
 imap.idle()

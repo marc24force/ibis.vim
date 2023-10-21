@@ -5,7 +5,7 @@ import logging
 import os
 import quopri
 import re
-import smtplib
+import smtplib, ssl
 import subprocess
 import sys
 import threading
@@ -210,7 +210,7 @@ while True:
             smtp_login = request["smtp-login"]
             smtp_passwd = request["smtp-passwd"]
 
-            imap_client = IMAPClient(host=imap_host, port=imap_port)
+            imap_client = IMAPClient(host=imap_host, port=imap_port, ssl=True)
             imap_client.login(imap_login, imap_passwd)
             PreventLogout()
 
@@ -258,8 +258,10 @@ while True:
             message["From"] = formataddr((request["from"]["name"], request["from"]["email"]))
             message["Message-Id"] = make_msgid()
 
-            smtp = smtplib.SMTP(host=smtp_host, port=smtp_port)
-            smtp.starttls()
+            #smtp = smtplib.SMTP(host=smtp_host, port=smtp_port)
+            #smtp.starttls()
+
+            smtp = smtplib.SMTP_SSL(host=smtp_host, port=smtp_port)
             smtp.login(smtp_login, smtp_passwd)
             smtp.send_message(message)
             smtp.quit()
