@@ -14,6 +14,10 @@ function! ibis#start()
       \"SMTP password (empty=same as IMAP)"
     \)
 
+    if smtp_password == ""
+      let smtp_password = imap_password
+    endif
+
     call ibis#api#start()
     call ibis#api#login(imap_password, smtp_password)
     call ibis#api#select_folder("INBOX")
