@@ -39,8 +39,12 @@ function! ibis#ui#select_folder()
       \"down": "25%",
     \})
   else
-    echo join(map(copy(folders), "printf('%s (%d)', v:val, v:key)"), ", ") . ": "
-    let choice = nr2char(getchar())
+    echo join(map(copy(folders), "printf('%s (%0d)', v:val, v:key)"), ", ") . ": "
+    if len(folders) > 10
+      let choice = ibis#utils#getnchar(2)
+    else
+      let choice = nr2char(getchar())
+    endif
     call ibis#api#select_folder(folders[choice])
   endif
 endfunction

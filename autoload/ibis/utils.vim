@@ -68,3 +68,15 @@ function! ibis#utils#define_maps(maps)
     endif
   endfor
 endfunction
+
+function! ibis#utils#getnchar(n)
+  let l:number = a:n
+  let l:string = ""
+
+  while l:number > 0
+    let l:string .= nr2char(getchar())
+    let l:number -= 1
+  endwhile
+
+  return l:string
+endfunction
