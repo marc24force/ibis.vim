@@ -3,6 +3,13 @@ function! ibis#job#vim8#start(script, handle_data)
   if !has("job") | throw "job" | endif
   if !has("channel") | throw "channel" | endif
 
+  call system("pip list | grep IMAPClient")
+  if v:shell_error != 0 
+    echo "Installing IMAPClient"
+    call system("pip install imapclient")
+    if v:shell_error != 0 | throw "pip" | endif
+  endif
+
   let cmd = printf("python3 '%s'", a:script)
   let options = {
     \"in_mode": "nl",
