@@ -63,7 +63,7 @@ function! ibis#ui#preview_email(email, format)
   if a:format == "text"
     let email = substitute(a:email, "", "", "g")
 
-    silent! bdelete "Ibis preview"
+    silent! bdelete Ibis\ preview
     silent! edit Ibis preview
     call append(0, split(email, "\n"))
     normal! ddgg
@@ -76,7 +76,7 @@ function! ibis#ui#preview_email(email, format)
 endfunction
 
 function! ibis#ui#new_email()
-  silent! bdelete "Ibis new"
+  silent! bdelete Ibis\ new
   silent! edit Ibis new
 
   call append(0, [
@@ -104,7 +104,7 @@ function! ibis#ui#reply_email()
     let reply_to = email["reply-to"]
   endif
 
-  silent! bdelete "Ibis reply"
+  silent! bdelete Ibis\ reply
   silent! edit Ibis reply
 
   call append(0, [
@@ -133,7 +133,7 @@ function! ibis#ui#reply_all_email()
     let reply_to = email["reply-to"]
   endif
 
-  silent! bdelete "Ibis reply all"
+  silent! bdelete Ibis\ reply\ all
   silent! edit Ibis reply all
 
   call append(0, [
@@ -156,7 +156,7 @@ function! ibis#ui#forward_email()
   let email = ibis#cache#read("emails", [])[index]
   let message = getline(1, "$")
 
-  silent! bdelete "Ibis forward"
+  silent! bdelete Ibis\ forward
   silent! edit Ibis forward
 
   call append(0, [
