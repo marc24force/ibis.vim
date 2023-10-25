@@ -45,22 +45,19 @@ def get_emails(last_seq, chunk_size):
         return emails
 
     ids = "%d:%d" % (last_seq, last_seq - chunk_size) if (last_seq > chunk_size) else "%d:%d" % (last_seq, 1)
-    fetch = imap_client.fetch(ids, ["FLAGS", "ENVELOPE", "INTERNALDATE", "BODY.PEEK[HEADER]", "BODYSTRUCTURE", "FLAGS"])
+    fetch = imap_client.fetch(ids, ["FLAGS", "ENVELOPE", "INTERNALDATE", "BODYSTRUCTURE"])
 
     for [uid, data] in fetch.items():
-        header = BytesHeaderParser(policy=policy.default).parsebytes(data[b"BODY[HEADER]"])
         envelope = data[b"ENVELOPE"]
         logging.info(data[b"BODYSTRUCTURE"])
         struct = data[b"BODYSTRUCTURE"][0] if isinstance(data[b"BODYSTRUCTURE"][0], list) else []
-        has_attachment = len([mime[0] for mime in struct if mime[0] and mime[0] not in [b"text", b"multipart"]]) > 0
+        has_attachment = "filename" in str(struct).lower()
+
         subject = decode_byte(envelope.subject)
-        from_ = envelope.from_[0]
-        from_ = "@".join([decode_byte(from_.mailbox), decode_byte(from_.host)])
-        if envelope.to is None:
-            to = ""
-        else:
-            to = envelope.to[0]
-            to = "@".join([decode_byte(to.mailbox), decode_byte(to.host)])
+        from_ = "" if envelope.from_ is None else envelope.from_[0]
+        from_ = "" if from_ is "" else "@".join([decode_byte(from_.mailbox), decode_byte(from_.host)])
+        to = "" if envelope.to is None else envelope.to[0]
+        to = "" if to is "" else "@".join([decode_byte(to.mailbox), decode_byte(to.host)])
         date_ = data[b"INTERNALDATE"].strftime("%d/%m/%y, %Hh%M")
 
         email = dict()
@@ -71,8 +68,6 @@ def get_emails(last_seq, chunk_size):
         email["date"] = date_
         email["flags"] = get_flags_str(data[b"FLAGS"], has_attachment)
         email["message-id"] = envelope.message_id.decode()
-        email["reply-to"] = header["Reply-To"] if "Reply-To" in header else None
-
         emails.insert(0, email)
 
     return emails
@@ -92,7 +87,7 @@ def get_flags_str(flags, has_attachment):
     flags_str += "R" if b"\\Answered" in flags else " "
     flags_str += "F" if b"\\Flagged" in flags else " "
     flags_str += "D" if b"\\Draft" in flags else " "
-    flags_str += "@" if has_attachment else " "
+    flags_str += "@" if has_attachment else " " 
 
     return flags_str
     
