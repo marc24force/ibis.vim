@@ -7,7 +7,8 @@ function! ibis#utils#encrypt(string)
     let s:key_set = 1
   endif
   let l:enc_func = printf(g:ibis_profile_enc_func, s:key)
-  let l:encrypted = system('echo "' . a:string . '" | ' . l:enc_func)
+  let l:string = substitute(a:string, '"', '\\"', 'g')
+  let l:encrypted = system('echo "' . l:string . '" | ' . l:enc_func)
   return l:encrypted
 endfunction
 
