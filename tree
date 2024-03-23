@@ -1,0 +1,29 @@
+- autoload/: main plugin files
+	- ibis/:
+		- job/: Call job function
+			- neovim.vim
+			- vim8.vim
+		- api.vim: API for connecting with the script
+		- cache.vim: Cache function for storing info
+		- idle.vim: Idle main file
+		- job.vim: Job wrapper function file
+		- ui.vim: UI functions
+		- utils.vim: General useful functions
+	- ibis.vim: Start function (main file)
+
+- ftplugin/: filetype configuration files
+	- ibis-edit.vim: editing mail
+	- ibis-list.vim: mail list view
+	- ibis-preview.vim: mail read view
+
+- plugin/:
+	- ibis.vim: start call & default g: variables definition/values
+
+- syntax/: Syntax highlight files
+	- ibis-edit.vim: editing mail
+	- ibis-list.vim: mail list view
+	- ibis-preview.vim: mail read view
+
+- api.py: main python script
+
+- idle.py: idle script
