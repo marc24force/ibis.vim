@@ -4,6 +4,9 @@ let s:job = v:null
 
 function! ibis#api#start()
   let s:job = ibis#job#start(s:path, function("s:handle_data"))
+  if g:ibis_logging == 0
+    call ibis#job#send(s:job, {"type" : "nolog"})
+  endif
 endfunction
 
 function! s:handle_data(data_raw)
@@ -20,17 +23,22 @@ function! s:handle_data(data_raw)
 endfunction
 
 function! ibis#api#login(profile)
+  let l:imap_pswd = (a:profile["imap_pswd"] == "") ? ibis#ui#prompt_passwd("Input IMAP password: ") : a:profile["imap_pswd"]
+  let l:smtp_pswd = (a:profile["smtp_pswd"] == "") ? ibis#ui#prompt_passwd("Input SMTP password: ") : a:profile["smtp_pswd"]
+  if l:smtp_pswd == ""
+    let l:smtp_pswd = l:imap_pswd
+  endif
   call ibis#utils#log("Logging in...")
   let l:data = {
         \"type"       : "login",
         \"imap-host"  : a:profile["imap_host"],
         \"imap-port"  : a:profile["imap_port"],
         \"imap-login" : a:profile["imap_login"],
-        \"imap-pswd"  : a:profile["imap_pswd"],
+        \"imap-pswd"  : l:imap_pswd,
         \"smtp-host"  : a:profile["smtp_host"],
         \"smtp-port"  : a:profile["smtp_port"],
         \"smtp-login" : a:profile["smtp_login"],
-        \"smtp-pswd"  : a:profile["smtp_pswd"]}
+        \"smtp-pswd"  : l:smtp_pswd}
   call ibis#job#send(s:job, l:data)
 
 endfunction

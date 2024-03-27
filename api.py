@@ -18,13 +18,12 @@ from email.parser import BytesParser, BytesHeaderParser
 from email.utils import formataddr, formatdate, make_msgid
 from imapclient.imapclient import IMAPClient
 
-#TODO clear file on start
 log_filename = os.path.join(os.path.dirname(os.path.realpath(__file__)), "ibis-api.log")
-logging.basicConfig(filename=log_filename, format="[%(asctime)s] %(message)s", level=logging.INFO, datefmt="%Y-%m-%d %H:%M:%S")
+logging.basicConfig(filename=log_filename, format="[%(asctime)s] %(message)s", level=logging.INFO, datefmt="%Y-%m-%d %H:%M:%S", filemode='w')
 
 imap_client = None
-imap_host = imap_port = imap_login = imap_passwd = None
-smtp_host = smtp_port = smtp_login = smtp_passwd = None
+imap_host = imap_port = imap_login = imap_pswd = None
+smtp_host = smtp_port = smtp_login = smtp_pswd = None
 
 class PreventLogout(threading.Thread):
     def __init__(self):
@@ -43,9 +42,13 @@ while True:
     try: request = json.loads(request_raw.rstrip())
     except: continue
 
-    logging.info("Request: " + str({key: request[key] for key in request if key not in ["imap-passwd", "smtp-passwd"]}))
+    logging.info("Request: " + str({key: request[key] for key in request if key not in ["imap-pswd", "smtp-pswd"]}))
 
-    if request["type"] == "login":
+    if request["type"] == "nolog":
+        logging.disable(logging.CRITICAL)
+        response = dict(success=True, type="nolog")
+
+    elif request["type"] == "login":
         try:
             imap_host = request["imap-host"]
             imap_port = request["imap-port"]

@@ -46,7 +46,7 @@ function! ibis#profile#edit(profile)
   " Create a new empty buffer
   enew
   " Set the buffer name
-  execute 'file ' . s:EditorBuffName
+  silent execute 'file ' . s:EditorBuffName
   " Set the filetype 
   setfiletype IbisProfileEdit
   " Set the contents

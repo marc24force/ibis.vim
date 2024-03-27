@@ -3,7 +3,7 @@ let s:key_set = 0
 
 function! ibis#utils#encrypt(string)
   if s:key_set == 0
-    let s:key = ibis#ui#prompt_passwd()
+    let s:key = ibis#ui#prompt_passwd("Input Ibis password: ")
     let s:key_set = 1
   endif
   let l:enc_func = printf(g:ibis_profile_enc_func, s:key)
@@ -14,7 +14,7 @@ endfunction
 
 function! ibis#utils#decrypt(string)
   if s:key_set == 0
-    let s:key = ibis#ui#prompt_passwd()
+    let s:key = ibis#ui#prompt_passwd("Input Ibis password: ")
   endif
   let l:dec_func = printf(g:ibis_profile_dec_func, s:key)
   let l:decrypted = system('echo "' . a:string . '" | ' . l:dec_func)

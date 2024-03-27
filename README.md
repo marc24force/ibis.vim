@@ -100,3 +100,10 @@ Note that you have to use `%s` as a placeholder for the key, which you will be a
 let g:ibis_profile_enc_func = "openssl enc -aes-256-cbc -k %s -base64 -A -pbkdf2"
 let g:ibis_profile_dec_func = "openssl enc -d -aes-256-cbc -k %s -base64 -A -pbkdf2"
 ```
+
+Ibis provides a logging feature to help identify any issue when sending and receiving data.
+The passwords are always hidden from the log, however, in case that you want to avoid having sensible information stored you can disable it with:
+
+```vim
+let g:ibis_logging = 0
+```
