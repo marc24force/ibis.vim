@@ -16,12 +16,13 @@ function! ibis#update(signal)
     if a:signal == "Done" || a:signal == "Exists"
       let s:state = "Login"
     endif
-  elseif s:state == "Start"
+  elseif s:state == "Login"
   endif
   call ibis#loop()
 endfunction
 
 function! s:start_state()
+  call ibis#api#start()
   if !filereadable(expand(g:ibis_profile_path) . "/profile")
     "Create profile
     call ibis#profile#new()
@@ -32,5 +33,6 @@ endfunction
 
 function! s:login_state()
   let l:open = ibis#profile#open(g:ibis_profile_default)
-  call ibis#utils#log(json_encode(l:open))
+  call ibis#api#login(l:open)
+  "call ibis#utils#log(json_encode(l:open))
 endfunction
