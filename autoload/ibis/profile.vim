@@ -126,7 +126,7 @@ function! ibis#profile#save()
     call add(l:profiles, l:new_profile)
     call ibis#profile#write(json_encode(l:profiles))
     bw!
-    call ibis#update("Done")
+    call ibis#update("ProfileSaved")
   else
     call ibis#utils#elog("Profile with that name already exists!")
   endif

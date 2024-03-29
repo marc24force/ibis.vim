@@ -18,6 +18,7 @@ function! s:handle_data(data_raw)
   endif
 
   if data.type == "login"
+    call ibis#cache#write("folders", data.folders)
     call ibis#utils#log("Logged in!")
   endif
 endfunction
@@ -40,5 +41,11 @@ function! ibis#api#login(profile)
         \"smtp-login" : a:profile["smtp_login"],
         \"smtp-pswd"  : l:smtp_pswd}
   call ibis#job#send(s:job, l:data)
-
 endfunction
+
+function! ibis#api#select_folder(folder)
+  call ibis#utils#log("Selecting folder...")
+  let l:data = {"type": "select-folder", "folder": a:folder, "chunk-size": g:ibis_emails_chunk_size}
+  call ibis#job#send(s:job, l:data)
+endfunction
+
