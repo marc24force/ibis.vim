@@ -221,8 +221,9 @@ while True:
             folder = request["folder"]
             seq = imap_client.select_folder(folder)[b"UIDNEXT"]
             emails = get_emails(seq, request["chunk-size"])
+            total = imap_client.folder_status(folder, 'MESSAGES')[b"MESSAGES"]
             is_folder_selected = True
-            response = dict(success=True, type="select-folder", folder=folder, seq=seq, emails=emails)
+            response = dict(success=True, type="select-folder", folder=folder, seq=seq, total=total, emails=emails)
         except Exception as error:
             response = dict(success=False, type="select-folder", error=str(error))
 

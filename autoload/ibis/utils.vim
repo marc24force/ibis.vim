@@ -67,3 +67,52 @@ function! ibis#utils#mprintf(format, arg)
   let l:args = repeat('"' . a:arg . '", ', l:num - 1) . '"' . a:arg . '"'
   execute 'return printf("'. a:format . '", '. l:args .')'
 endfunction
+
+
+"OLD
+function! ibis#utils#assign(...)
+  let overrides = copy(a:000)
+  let base = remove(overrides, 0)
+
+  for override in overrides
+    for [key, val] in items(override)
+      let base[key] = val
+      unlet key val
+    endfor
+  endfor
+
+  return base
+endfunction
+
+function! ibis#utils#sum(array)
+  let total = 0
+
+  for item in a:array
+    let total += item
+  endfor
+
+  return total
+endfunction
+
+function! ibis#utils#define_maps(maps)
+  for [mode, key, plug] in a:maps
+    let plug = printf("<plug>(ibis-%s)", plug)
+
+    if !hasmapto(plug, mode)
+      execute printf("%smap <nowait> <buffer> %s %s", mode, key, plug)
+    endif
+  endfor
+endfunction
+
+function! ibis#utils#getnchar(n)
+  let l:number = a:n
+  let l:string = ""
+
+  while l:number > 0
+    let l:string .= nr2char(getchar())
+    let l:number -= 1
+  endwhile
+
+  return l:string
+endfunction
+

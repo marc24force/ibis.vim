@@ -20,6 +20,14 @@ function! s:handle_data(data_raw)
   if data.type == "login"
     call ibis#cache#write("folders", data.folders)
     call ibis#utils#log("Logged in!")
+  elseif data.type == "select-folder"
+    call ibis#cache#write("folder", data.folder)
+    call ibis#cache#write("total", data.total)
+    call ibis#cache#write("seq", data.seq)
+    call ibis#cache#write("page", 0)
+    call ibis#cache#write("emails", data.emails)
+    call ibis#ui#list_email()
+    call ibis#utils#log("Showing mails " . g:ibis_emails_chunk_size . "/" . data.total)
   endif
 endfunction
 

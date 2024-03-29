@@ -48,7 +48,7 @@ function! ibis#profile#edit(profile)
   " Set the buffer name
   silent execute 'file ' . s:EditorBuffName
   " Set the filetype 
-  setfiletype IbisProfileEdit
+  setfiletype ibis-profile-edit
   " Set the contents
   call s:editor_text(a:profile)
 endfunction
