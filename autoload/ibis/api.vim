@@ -27,7 +27,7 @@ function! s:handle_data(data_raw)
     call ibis#cache#write("page", 0)
     call ibis#cache#write("emails", data.emails)
     call ibis#ui#list_email()
-    call ibis#utils#log("Showing mails " . g:ibis_emails_chunk_size . "/" . data.total)
+    call ibis#utils#log("Showing mails 1 to " .g:ibis_emails_chunk_size . " of " . data.total)
   endif
 endfunction
 
