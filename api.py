@@ -37,14 +37,16 @@ def get_contacts():
 
     return list(contacts)
 
-def get_emails(last_seq, chunk_size):
+def get_emails(page, chunk_size):
     global imap_client
 
     emails = []
-    if last_seq == 0:
+    if page < 0:
         return emails
 
-    ids = "%d:%d" % (last_seq, last_seq - chunk_size) if (last_seq > chunk_size) else "%d:%d" % (last_seq, 1)
+    uids = imap_client.search(['ALL'])
+    uids.reverse()
+    ids = uids[chunk_size*page:chunk_size+page*chunk_size]
     fetch = imap_client.fetch(ids, ["FLAGS", "ENVELOPE", "INTERNALDATE", "BODYSTRUCTURE"])
 
     for [uid, data] in fetch.items():
@@ -66,7 +68,7 @@ def get_emails(last_seq, chunk_size):
         email["to"] = to
         email["date"] = date_
         email["flags"] = get_flags_str(data[b"FLAGS"], has_attachment)
-        email["message-id"] = envelope.message_id.decode()
+        email["message-id"] = "" if envelope.message_id is None else envelope.message_id.decode()
         emails.insert(0, email)
 
     return emails
@@ -216,14 +218,26 @@ while True:
         except Exception as error:
             response = dict(success=False, type="login", error=str(error))
 
+    elif request["type"] == "fetch-emails":
+        try:
+            emails = get_emails(request["page"], request["chunk-size"])
+            total = imap_client.folder_status(folder, 'MESSAGES')[b"MESSAGES"]
+            msg = "Showing messages %d to %d of %d" % (1+request["page"]*request["chunk-size"], len(emails)+request["page"]*request["chunk-size"], total)
+            logging.info(msg)
+            response = dict(success=True, type="fetch-emails", msg=msg, emails=emails)
+        except Exception as error:
+            response = dict(success=False, type="fetch-emails", error=str(error))
+
     elif request["type"] == "select-folder":
         try:
             folder = request["folder"]
             seq = imap_client.select_folder(folder)[b"UIDNEXT"]
-            emails = get_emails(seq, request["chunk-size"])
+            emails = get_emails(0, request["chunk-size"])
             total = imap_client.folder_status(folder, 'MESSAGES')[b"MESSAGES"]
+            msg = "Showing messages %d to %d of %d" % (1, len(emails), total)
+            logging.info(msg)
             is_folder_selected = True
-            response = dict(success=True, type="select-folder", folder=folder, seq=seq, total=total, emails=emails)
+            response = dict(success=True, type="select-folder", folder=folder, seq=seq, msg=msg, emails=emails)
         except Exception as error:
             response = dict(success=False, type="select-folder", error=str(error))
 

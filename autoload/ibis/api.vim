@@ -22,12 +22,17 @@ function! s:handle_data(data_raw)
     call ibis#utils#log("Logged in!")
   elseif data.type == "select-folder"
     call ibis#cache#write("folder", data.folder)
-    call ibis#cache#write("total", data.total)
     call ibis#cache#write("seq", data.seq)
     call ibis#cache#write("page", 0)
     call ibis#cache#write("emails", data.emails)
     call ibis#ui#list_email()
-    call ibis#utils#log("Showing mails 1 to " .g:ibis_emails_chunk_size . " of " . data.total)
+    call ibis#utils#log(data.msg)
+  elseif data.type == "fetch-emails"
+    call ibis#cache#write("emails", data.emails)
+    let l:page = ibis#cache#read("page", 0)
+    call ibis#ui#list_email()
+    call ibis#utils#log(data.msg)
+
   endif
 endfunction
 
@@ -57,3 +62,41 @@ function! ibis#api#select_folder(folder)
   call ibis#job#send(s:job, l:data)
 endfunction
 
+function! ibis#api#fetch_all_emails()
+  let page = ibis#cache#read("page", 0)
+
+  call ibis#utils#log("Fetching emails...")
+  let l:data = {
+    \"type": "fetch-emails",
+    \"page": page,
+    \"chunk-size": g:ibis_emails_chunk_size,
+  \}
+  call ibis#job#send(s:job, l:data)
+endfunction
+
+function! ibis#api#prev_page_emails()
+  let page = ibis#cache#read("page", 0) - 1
+  if page < 0 | let page = 0 | endif
+  call ibis#cache#write("page", page)
+
+  call ibis#utils#log("Fetching previous page...")
+  let l:data = {
+    \"type": "fetch-emails",
+    \"page": page,
+    \"chunk-size": g:ibis_emails_chunk_size,
+  \}
+  call ibis#job#send(s:job, l:data)
+endfunction
+
+function! ibis#api#next_page_emails()
+  let page = ibis#cache#read("page", 0) + 1
+  call ibis#cache#write("page", page)
+
+  call ibis#utils#log("Fetching next page...")
+  let l:data = {
+    \"type": "fetch-emails",
+    \"page": page,
+    \"chunk-size": g:ibis_emails_chunk_size,
+  \}
+  call ibis#job#send(s:job, l:data)
+endfunction

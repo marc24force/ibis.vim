@@ -4,6 +4,7 @@ let s:state = "Start"
 "Edit -> Profile editor
 "Client -> Normal execution
 let s:profile = g:ibis_profile_default
+let s:login = 0
 
 function! ibis#loop()
   call ibis#utils#dlog("[STATE] = " . s:state)
@@ -47,7 +48,12 @@ function! s:create_state()
 endfunction
 
 function! s:client_state()
-  let l:open = ibis#profile#open(s:profile)
-  call ibis#api#login(l:open)
-  call ibis#api#select_folder("INBOX")
+  if s:login == 0
+    let l:open = ibis#profile#open(s:profile)
+    call ibis#api#login(l:open)
+    call ibis#api#select_folder("INBOX")
+    let s:login = 1
+  else 
+    call ibis#api#fetch_all_emails()
+  endif
 endfunction

@@ -232,17 +232,20 @@ function! s:get_max_widths(lines, columns)
   let tbl_width = ibis#utils#sum(max_widths) + len(max_widths) * 2 + 1
   let win_width = winwidth(0)
   let num_width = (&number || &relativenumber) ? &numberwidth : 0
-  let diff_width = tbl_width - win_width + num_width - 1
+  let diff_width = tbl_width - win_width + num_width 
 
-
-  if diff_width > 0
+  if diff_width >= 0
     let to_column_idx = index(s:config["list.to"]["columns"], "to")
-    let to_column_diff = diff_width / 5
+    let to_column_diff = max_widths[to_column_idx] - win_width/6
     let max_widths[to_column_idx] -= to_column_diff
     let subject_column_idx = index(s:config["list.to"]["columns"], "subject")
-    let subject_column_diff = diff_width - to_column_diff + 1
+    let subject_column_diff = diff_width - to_column_diff
     let max_widths[subject_column_idx] -= subject_column_diff
+  elseif diff_width < 0
+    let subject_column_idx = index(s:config["list.to"]["columns"], "subject")
+    let max_widths[subject_column_idx] -= diff_width 
   endif
+  echom max_widths
 
   return max_widths
 endfunction
