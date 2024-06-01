@@ -24,6 +24,7 @@ logging.basicConfig(filename=log_filename, format="[%(asctime)s] %(message)s", l
 imap_client = None
 imap_host = imap_port = imap_login = imap_pswd = None
 smtp_host = smtp_port = smtp_login = smtp_pswd = None
+logged_in = False
 
 no_reply_pattern = r"^.*no[\-_ t]*reply"
 
@@ -214,16 +215,23 @@ while True:
             PreventLogout()
 
             folders = list(map(lambda folder: folder[2], imap_client.list_folders()))
+            logged_in = True
             response = dict(success=True, type="login", folders=folders)
         except Exception as error:
             response = dict(success=False, type="login", error=str(error))
+    elif request["type"] == "logout":
+        try:
+            imap_client.logout()
+            logged_in = False
+            response = dict(success=True, type="logout")
+        except Exception as error:
+            response = dict(success=False, type="logout", error=str(error))
 
     elif request["type"] == "fetch-emails":
         try:
             emails = get_emails(request["page"], request["chunk-size"])
             total = imap_client.folder_status(folder, 'MESSAGES')[b"MESSAGES"]
             msg = "Showing messages %d to %d of %d" % (1+request["page"]*request["chunk-size"], len(emails)+request["page"]*request["chunk-size"], total)
-            logging.info(msg)
             response = dict(success=True, type="fetch-emails", msg=msg, emails=emails)
         except Exception as error:
             response = dict(success=False, type="fetch-emails", error=str(error))
@@ -231,13 +239,11 @@ while True:
     elif request["type"] == "select-folder":
         try:
             folder = request["folder"]
-            seq = imap_client.select_folder(folder)[b"UIDNEXT"]
-            emails = get_emails(0, request["chunk-size"])
-            total = imap_client.folder_status(folder, 'MESSAGES')[b"MESSAGES"]
-            msg = "Showing messages %d to %d of %d" % (1, len(emails), total)
-            logging.info(msg)
-            is_folder_selected = True
-            response = dict(success=True, type="select-folder", folder=folder, seq=seq, msg=msg, emails=emails)
+            if logged_in == False:
+                seq = 0
+            else:
+                seq = imap_client.select_folder(folder)[b"UIDNEXT"]
+            response = dict(success=True, type="select-folder", folder=folder, seq=seq)
         except Exception as error:
             response = dict(success=False, type="select-folder", error=str(error))
 

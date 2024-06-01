@@ -28,6 +28,7 @@ function! ibis#ui#select_folder()
       \"sink": function("ibis#api#select_folder"),
       \"down": "25%",
     \})
+    call ibis#api#fetch_all_emails()
   else
     echo join(map(copy(folders), "printf('%s (%0d)', v:val, v:key)"), ", ") . ": "
     if len(folders) > 10
@@ -35,7 +36,31 @@ function! ibis#ui#select_folder()
     else
       let choice = nr2char(getchar())
     endif
-    call ibis#api#select_folder(folders[choice])
+    if choice < len(folders)
+      call ibis#api#select_folder(folders[choice])
+      call ibis#api#fetch_all_emails()
+    else
+      call ibis#utils#elog("Index outside of folders range")
+    endif
+  endif
+endfunction
+
+function! ibis#ui#select_profile()
+  let l:profiles = ["NEW PROFILE"] + ibis#profile#list()
+  redraw | echo join(map(copy(l:profiles), "printf('%s (%0d)', v:val, v:key)"), ", ") . ": "
+  if len(l:profiles) > 10
+    let choice = ibis#utils#getnchar(2)
+  else
+    let choice = nr2char(getchar())
+  endif
+  if choice < len(l:profiles)
+    if choice != 0
+      call ibis#update("ProfileSelect", l:profiles[choice])
+    else
+      call ibis#update("ProfileCreate", "")
+    endif
+  else
+    call ibis#utils#elog("Index outside of profile range")
   endif
 endfunction
 
@@ -45,7 +70,7 @@ function! ibis#ui#list_email()
   let emails = ibis#cache#read("emails", [])
   let template = printf("list.%s", folder == "Sent" ? "to" : "from")
 
-  silent! bdelete Ibis
+  silent! bd Ibis
   silent! edit Ibis
 
   call append(0, s:render(template, emails))

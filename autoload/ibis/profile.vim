@@ -126,7 +126,7 @@ function! ibis#profile#save()
     call add(l:profiles, l:new_profile)
     call ibis#profile#write(json_encode(l:profiles))
     bw!
-    call ibis#update("ProfileSaved")
+    call ibis#update("ProfileSaved",l:new_profile["profile_name"])
   else
     call ibis#utils#elog("Profile with that name already exists!")
   endif
@@ -150,3 +150,15 @@ function! ibis#profile#open(name)
     return l:profiles[0]
   endif
 endfunction
+
+function! ibis#profile#list()
+  let l:list = []
+  let l:profiles = ibis#profile#read()
+    for prf in l:profiles
+      if prf["profile_name"] != ""
+        call add(l:list, prf["profile_name"])
+      endif
+    endfor
+    return l:list
+  endfunction
+

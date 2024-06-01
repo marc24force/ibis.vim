@@ -7,32 +7,43 @@ function! ibis#api#start()
   if g:ibis_logging == 0
     call ibis#job#send(s:job, {"type" : "nolog"})
   endif
+  if !filereadable(expand(g:ibis_profile_path) . "/profile")
+    call ibis#update("MissingProfile", "")
+  else
+    call ibis#update("ProfileExists", "")
+  endif
 endfunction
 
 function! s:handle_data(data_raw)
   if empty(a:data_raw) | return | endif
   let data = json_decode(a:data_raw)
 
-  if !data.success
-    return ibis#utils#elog("api: " . string(data.error))
-  endif
-
-  if data.type == "login"
-    call ibis#cache#write("folders", data.folders)
-    call ibis#utils#log("Logged in!")
-  elseif data.type == "select-folder"
-    call ibis#cache#write("folder", data.folder)
-    call ibis#cache#write("seq", data.seq)
-    call ibis#cache#write("page", 0)
-    call ibis#cache#write("emails", data.emails)
-    call ibis#ui#list_email()
-    call ibis#utils#log(data.msg)
-  elseif data.type == "fetch-emails"
-    call ibis#cache#write("emails", data.emails)
-    let l:page = ibis#cache#read("page", 0)
-    call ibis#ui#list_email()
-    call ibis#utils#log(data.msg)
-
+  if data.success
+    if data.type == "login"
+      call ibis#cache#write("folders", data.folders)
+      call ibis#utils#log("Logged in!")
+      call ibis#update("LoggedIn","")
+    elseif data.type == "select-folder"
+      call ibis#cache#write("folder", data.folder)
+      call ibis#cache#write("seq", data.seq)
+      call ibis#cache#write("page", 0)
+    elseif data.type == "logout"
+      call ibis#utils#log("Logged out")
+      call ibis#update("LoggedOut","")
+    elseif data.type == "fetch-emails"
+      call ibis#cache#write("emails", data.emails)
+      let l:page = ibis#cache#read("page", 0)
+      call ibis#ui#list_email()
+      call ibis#utils#log(data.msg)
+    endif
+  else
+    if data.type == "login"
+      call ibis#cache#write("seq", 0)
+      call ibis#cache#write("page", 0)
+      call ibis#cache#write("emails", [])
+      call ibis#update("Failed","")
+    endif
+    return ibis#utils#elog("IMAPClient: " . string(data.error))
   endif
 endfunction
 
@@ -42,7 +53,7 @@ function! ibis#api#login(profile)
   if l:smtp_pswd == ""
     let l:smtp_pswd = l:imap_pswd
   endif
-  call ibis#utils#log("Logging in...")
+  call ibis#utils#log("Logging in as " . a:profile["profile_name"])
   let l:data = {
         \"type"       : "login",
         \"imap-host"  : a:profile["imap_host"],
@@ -53,6 +64,11 @@ function! ibis#api#login(profile)
         \"smtp-port"  : a:profile["smtp_port"],
         \"smtp-login" : a:profile["smtp_login"],
         \"smtp-pswd"  : l:smtp_pswd}
+  call ibis#job#send(s:job, l:data)
+endfunction
+
+function! ibis#api#logout()
+  let l:data = {"type" : "logout"}
   call ibis#job#send(s:job, l:data)
 endfunction
 
