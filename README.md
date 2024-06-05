@@ -41,8 +41,9 @@ In 2024 the project was redone from scratch in order to fix some issues and wrap
   - Job enabled `:echo has("job")`
   - Channel enabled `:echo has("channel")`
   - Install python library imapclient
+  - Install google auth2 libraries
 >```bash
->pip install imapclient
+>pip install imapclient google-auth google-auth-oauthlib
 >```
 
 This project will be only tested on Vim8+, if you want to use it on Neovim
@@ -93,7 +94,7 @@ If you prefer to have the passwords saved you can encrypt the profile file for m
 let g:ibis_profile_encrypted = 1
 ```
 
-By default the encryption uses OpenSSL, if you prefer to use a different approach you modify the following variables.
+By default the encryption uses OpenSSL, if you prefer to use a different approach you can modify the following variables.
 Note that you have to use `%s` as a placeholder for the key, which you will be asked to input once for each session.
 
 ```vim
@@ -107,3 +108,35 @@ The passwords are always hidden from the log, however, in case that you want to 
 ```vim
 let g:ibis_logging = 0
 ```
+
+## TODO
+
+General:
+- ✓ OAUTH2 support
+- ✗ Encrypt OAUTH2 files
+- ✗ Multilanguage
+
+In Ibis list:
+- ✓ `fs` (folder select: allows to change the current selected folder)
+- ✓ `ps` (profile select: allows to change the current profile, it also allows to create a new one)
+- ✓ `pd` (profile delete: deletes an existing profile)
+- ✗ `pe` (profile edit: modifies an existing profile)
+- ✗ `<cr>` (enter: open the mail under the cursor)
+- ✗ `mh` (mail html: open the mail under the cursor in an html viewer)
+- ✗ `mw` (mail new: Write a new mail)
+- ✗ `ma` (mail attachment: download attachments of the mail under the cursor)
+- ✗ `mr` (mail reply: reply to the mail under the cursor)
+- ✗ `mf` (mail forward: forward the mail under the cursor)
+- ✓ `gn` (go next page: go to the next page)
+- ✓ `gp` (go previous page: go to the previous page)
+- ✓ `gb` (go back page: go to the first page)
+
+In Ibis preview:
+- ✗ `mh` (mail html: open the mail in an html viewer)
+- ✗ `ma` (mail attachment: download attachments of the oppened mail)
+- ✗ `mr` (mail reply: reply to the oppened mail)
+- ✗ `mf` (mail forward: forward the oppened mail)
+ 
+In Ibis compose:
+- ✗ `ma` (mail attach: attach a file in the mail)
+- ✗ `ms` (mail send: send the mail)
