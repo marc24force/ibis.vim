@@ -1,4 +1,4 @@
-let s:ibis_blank_profile = {"profile_name":"Profile1","imap_host":"imap.example.com","imap_port":993,"imap_login":"user1","imap_pswd":"","smtp_host":"smtp.example.com","smtp_port":587,"smtp_login":"user1","smtp_pswd":"","name":"Your Name","mail":"your.name@example.com"}
+let s:ibis_blank_profile = {"profile_name":"Profile1","imap_host":"imap.example.com","imap_port":993,"imap_login":"user1","imap_pswd":"","smtp_host":"smtp.example.com","smtp_port":587,"smtp_login":"user1","smtp_pswd":"","name":"Your Name","mail":"your.name@example.com","oauth2":"no"}
 let s:EditorBuffName = "Profile Editor"
 
 function! s:editor_text(profile)
@@ -6,7 +6,8 @@ function! s:editor_text(profile)
                 \ "Do not remove any lines either!")
   call append(01, "Leaving IMAP and SMTP passwords blanks will prompt for them when login in. " .
                 \ "Otherwise the password is stored in the profile file located at 'g:ibis_profile_path'.")
-  call append(02, "If only one password is set, both IMAP and SMTP will use the same one.")
+  call append(02, "If only one password is set, both IMAP and SMTP will use the same one. " . 
+                \ "Enabling the OAUTH2 protocol will ignore any password.")
   call append(03, "If you have the encryption for the profile file enabled, you will be prompted for it when confirming.")
   call append(04, "__________________________________________________")
   call append(05, "")
@@ -25,6 +26,9 @@ function! s:editor_text(profile)
   call append(18, "SMTP host: [" . a:profile["smtp_host"] . "]")
   call append(19, "SMTP port: [" . a:profile["smtp_port"] . "]")
   call append(20, "SMTP password: []")
+  call append(21, "")
+  call append(22, "OAUTH2 configuration (no/yes)")
+  call append(23, "OAUTH2 enabled: [" . a:profile["oauth2"] . "]")
   call cursor(7,16) "To edit profile name
   call deletebufline('%',line('$'))
 endfunction
@@ -113,6 +117,7 @@ function! ibis#profile#save()
                       \"smtp_port"   :s:get_field(20),
                       \"smtp_login"  :s:get_field(18),
                       \"smtp_pswd"   :l:smtp_pswd,
+                      \"oauth2"      :s:get_field(24),
                       \"name"        :s:get_field(9),
                       \"mail"        :s:get_field(8)}
 

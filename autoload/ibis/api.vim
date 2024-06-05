@@ -16,10 +16,11 @@ endfunction
 
 function! s:handle_data(data_raw)
   if empty(a:data_raw) | return | endif
+  if a:data_raw[0] != '{' | return | endif
   let data = json_decode(a:data_raw)
 
   if data.success
-    if data.type == "login"
+    if data.type == "login" || data.type == "oauth2"
       call ibis#cache#write("folders", data.folders)
       call ibis#utils#log("Logged in!")
       call ibis#api#select_folder("INBOX")
@@ -38,7 +39,7 @@ function! s:handle_data(data_raw)
       call ibis#utils#log(data.msg)
     endif
   else
-    if data.type == "login"
+    if data.type == "login" || data.type == "oauth2"
       call ibis#cache#write("seq", 0)
       call ibis#cache#write("page", 0)
       call ibis#cache#write("emails", [])
@@ -50,21 +51,32 @@ endfunction
 
 function! ibis#api#login(profile)
   call ibis#utils#log("Logging in as " . a:profile["profile_name"])
-  let l:imap_pswd = (a:profile["imap_pswd"] == "") ? ibis#ui#prompt_passwd("Input IMAP password: ") : a:profile["imap_pswd"]
-  let l:smtp_pswd = (a:profile["smtp_pswd"] == "") ? ibis#ui#prompt_passwd("Input SMTP password: ") : a:profile["smtp_pswd"]
-  if l:smtp_pswd == ""
-    let l:smtp_pswd = l:imap_pswd
+  if a:profile["oauth2"] != "yes"
+    let l:imap_pswd = (a:profile["imap_pswd"] == "") ? ibis#ui#prompt_passwd("Input IMAP password: ") : a:profile["imap_pswd"]
+    let l:smtp_pswd = (a:profile["smtp_pswd"] == "") ? ibis#ui#prompt_passwd("Input SMTP password: ") : a:profile["smtp_pswd"]
+    if l:smtp_pswd == ""
+      let l:smtp_pswd = l:imap_pswd
+    endif
+    let l:data = {
+          \"type"       : "login",
+          \"imap-host"  : a:profile["imap_host"],
+          \"imap-port"  : a:profile["imap_port"],
+          \"imap-login" : a:profile["imap_login"],
+          \"imap-pswd"  : l:imap_pswd,
+          \"smtp-host"  : a:profile["smtp_host"],
+          \"smtp-port"  : a:profile["smtp_port"],
+          \"smtp-login" : a:profile["smtp_login"],
+          \"smtp-pswd"  : l:smtp_pswd}
+  else
+    let l:data = {
+          \"type"       : "oauth2",
+          \"cred_file"  : expand(g:ibis_oauth2_cred_path) . "/" . a:profile["profile_name"],
+          \"token_file" : expand(g:ibis_oauth2_tokens_path) . "/" . a:profile["profile_name"] . "_token",
+          \"imap-host"  : a:profile["imap_host"],
+          \"imap-port"  : a:profile["imap_port"],
+          \"email"      : a:profile["mail"],
+          \"oauth2"     : a:profile["oauth2"]}
   endif
-  let l:data = {
-        \"type"       : "login",
-        \"imap-host"  : a:profile["imap_host"],
-        \"imap-port"  : a:profile["imap_port"],
-        \"imap-login" : a:profile["imap_login"],
-        \"imap-pswd"  : l:imap_pswd,
-        \"smtp-host"  : a:profile["smtp_host"],
-        \"smtp-port"  : a:profile["smtp_port"],
-        \"smtp-login" : a:profile["smtp_login"],
-        \"smtp-pswd"  : l:smtp_pswd}
   call ibis#job#send(s:job, l:data)
 endfunction
 

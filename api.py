@@ -18,6 +18,11 @@ from email.parser import BytesParser, BytesHeaderParser
 from email.utils import formataddr, formatdate, make_msgid
 from imapclient.imapclient import IMAPClient
 
+#OAUTH2 from google
+from google.auth.transport.requests import Request
+from google.oauth2.credentials import Credentials
+from google_auth_oauthlib.flow import InstalledAppFlow
+
 log_filename = os.path.join(os.path.dirname(os.path.realpath(__file__)), "ibis-api.log")
 logging.basicConfig(filename=log_filename, format="[%(asctime)s] %(message)s", level=logging.INFO, datefmt="%Y-%m-%d %H:%M:%S", filemode='w')
 
@@ -186,6 +191,28 @@ class PreventLogout(threading.Thread):
         while not self.event.wait(60):
             logging.info("NOOP")
             imap_client.noop()
+
+def get_oauth2_creds(token_file, creds_file):
+    creds = None
+    scopes = ['https://mail.google.com/']
+    # The token.json file stores the user's access and refresh tokens, and is
+    # created automatically when the authorization flow completes for the first time.
+    if os.path.exists(token_file):
+        creds = Credentials.from_authorized_user_file(token_file, scopes)
+    
+    # If there are no (valid) credentials available, let the user log in.
+    if not creds or not creds.valid:
+        if creds and creds.expired and creds.refresh_token:
+            creds.refresh(Request())
+        else:
+            flow = InstalledAppFlow.from_client_secrets_file(creds_file, scopes)
+            creds = flow.run_local_server(port=0)
+        
+        # Save the credentials for the next run
+        with open(token_file, 'w') as token:
+            token.write(creds.to_json())
+    
+    return creds
 while True:
     request_raw = sys.stdin.readline()
 
@@ -219,6 +246,24 @@ while True:
             response = dict(success=True, type="login", folders=folders)
         except Exception as error:
             response = dict(success=False, type="login", error=str(error))
+    elif request["type"] == "oauth2":
+        try:
+            imap_host = request["imap-host"]
+            imap_port = request["imap-port"]
+            user_email = request["email"]
+            token_file = request["token_file"]
+            cred_file = request["cred_file"]
+
+            imap_client = IMAPClient(host=imap_host, port=imap_port, ssl=True)
+            creds = get_oauth2_creds(token_file, cred_file)
+            imap_client.oauth2_login(user_email, creds.token)
+            PreventLogout()
+
+            folders = list(map(lambda folder: folder[2], imap_client.list_folders()))
+            logged_in = True
+            response = dict(success=True, type="oauth2", folders=folders)
+        except Exception as error:
+            response = dict(success=False, type="oauth2", error=str(error))
     elif request["type"] == "logout":
         try:
             imap_client.logout()
