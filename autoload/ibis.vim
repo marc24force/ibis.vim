@@ -6,6 +6,8 @@ let s:state = "Start"
 "Login  -> Log in to loaded profile
 "Client -> Normal execution
 
+let s:next_profile = g:ibis_profile_default
+
 function! ibis#loop()
   call ibis#utils#dlog("[STATE] = " . s:state)
 
@@ -16,10 +18,8 @@ function! ibis#loop()
     call ibis#profile#new()
 
   elseif s:state == "Login"
-    let l:open = ibis#profile#open(s:profile)
-    let s:profile = l:open["profile_name"]
+    let l:open = ibis#profile#open(s:next_profile)
     call ibis#api#login(l:open)
-    call ibis#api#select_folder("INBOX")
 
   elseif s:state == "Client"
     call ibis#api#fetch_all_emails()
@@ -38,7 +38,6 @@ function! ibis#update(signal, value)
   call ibis#utils#dlog("[CMD] = " . a:signal . "(". a:value . ")")
   if s:state == "Start"
     if a:signal == "ProfileExists"
-      let s:profile = g:ibis_profile_default
       let s:state = "Login"
     elseif a:signal == "MissingProfile"
       let s:state = "Create"
@@ -46,7 +45,7 @@ function! ibis#update(signal, value)
 
   elseif s:state == "Create"
     if a:signal == "ProfileSaved"
-      let s:profile = a:value
+      let s:next_profile = a:value
       let s:state = "Login"
     endif
 
@@ -59,7 +58,7 @@ function! ibis#update(signal, value)
 
   elseif s:state == "Client"
     if a:signal == "ProfileSelect"
-      let s:profile = a:value
+      let s:next_profile = a:value
       let s:state = "Logout"
     elseif a:signal == "ProfileCreate"
       let s:state = "Create"
@@ -72,7 +71,7 @@ function! ibis#update(signal, value)
 
   elseif s:state == "Logerr"
     if a:signal == "ProfileSelect"
-      let s:profile = a:value
+      let s:next_profile = a:value
       let s:state = "Login"
     elseif a:signal == "ProfileCreate"
       let s:state = "Create"

@@ -22,6 +22,7 @@ function! s:handle_data(data_raw)
     if data.type == "login"
       call ibis#cache#write("folders", data.folders)
       call ibis#utils#log("Logged in!")
+      call ibis#api#select_folder("INBOX")
       call ibis#update("LoggedIn","")
     elseif data.type == "select-folder"
       call ibis#cache#write("folder", data.folder)
@@ -48,12 +49,12 @@ function! s:handle_data(data_raw)
 endfunction
 
 function! ibis#api#login(profile)
+  call ibis#utils#log("Logging in as " . a:profile["profile_name"])
   let l:imap_pswd = (a:profile["imap_pswd"] == "") ? ibis#ui#prompt_passwd("Input IMAP password: ") : a:profile["imap_pswd"]
   let l:smtp_pswd = (a:profile["smtp_pswd"] == "") ? ibis#ui#prompt_passwd("Input SMTP password: ") : a:profile["smtp_pswd"]
   if l:smtp_pswd == ""
     let l:smtp_pswd = l:imap_pswd
   endif
-  call ibis#utils#log("Logging in as " . a:profile["profile_name"])
   let l:data = {
         \"type"       : "login",
         \"imap-host"  : a:profile["imap_host"],
@@ -109,6 +110,19 @@ function! ibis#api#next_page_emails()
   call ibis#cache#write("page", page)
 
   call ibis#utils#log("Fetching next page...")
+  let l:data = {
+    \"type": "fetch-emails",
+    \"page": page,
+    \"chunk-size": g:ibis_emails_chunk_size,
+  \}
+  call ibis#job#send(s:job, l:data)
+endfunction
+
+function! ibis#api#first_page_emails()
+  let page = 0
+  call ibis#cache#write("page", page)
+
+  call ibis#utils#log("Fetching first page...")
   let l:data = {
     \"type": "fetch-emails",
     \"page": page,

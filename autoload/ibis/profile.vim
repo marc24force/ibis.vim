@@ -145,20 +145,45 @@ function! ibis#profile#open(name)
   let l:profiles = ibis#profile#read()
   let l:find = s:find_profile(l:profiles, a:name)
   if a:name != "" && !empty(l:find)
-    return l:find
+    let l:open = l:find
   else
-    return l:profiles[0]
+    let l:open = l:profiles[0]
   endif
+
+  call ibis#cache#write("profile", l:open["profile_name"])
+  call ibis#cache#write("name", l:open["name"])
+  call ibis#cache#write("mail", l:open["mail"])
+
+  return l:open
+endfunction
+
+function! ibis#profile#get_mail(name)
+  let l:profiles = ibis#profile#read()
+  let l:find = s:find_profile(l:profiles, a:name)
+  if empty(l:find)
+    call ibis#utils#elog("Can't file profile " . a:name)
+    return ""
+  endif
+  return l:find["mail"]
 endfunction
 
 function! ibis#profile#list()
   let l:list = []
   let l:profiles = ibis#profile#read()
-    for prf in l:profiles
-      if prf["profile_name"] != ""
-        call add(l:list, prf["profile_name"])
-      endif
-    endfor
-    return l:list
-  endfunction
+  for prf in l:profiles
+    if prf["profile_name"] != ""
+      call add(l:list, prf["profile_name"])
+    endif
+  endfor
+  return l:list
+endfunction
 
+function! ibis#profile#delete(name)
+  let l:profiles = ibis#profile#read()
+  for i in range(len(l:profiles) - 1, 0, -1)
+    if l:profiles[i]["profile_name"] == a:name
+        call remove(l:profiles, i)
+    endif
+  endfor
+  call ibis#profile#write(json_encode(l:profiles))
+endfunction

@@ -18,6 +18,16 @@ function! ibis#ui#prompt_passwd(msg)
   return ibis#utils#pipe("inputsecret", "ibis#utils#trim")(a:msg)
 endfunction
 
+function! ibis#ui#prompt_confirm(mail)
+  if a:mail == "" 
+    ibis#utils#elog("Profile file is corrupted, can't proceed")
+    return 0
+  endif
+  let l:msg = "Type to confirm deleting the profile (" . a:mail ."): "
+  let l:confirm = ibis#utils#pipe("input", "ibis#utils#trim")(l:msg)
+  return l:confirm == a:mail
+endfunction
+
 function! ibis#ui#select_folder()
   let folder  = ibis#cache#read("folder", "INBOX")
   let folders = ibis#cache#read("folders", [])
@@ -36,6 +46,7 @@ function! ibis#ui#select_folder()
     else
       let choice = nr2char(getchar())
     endif
+    redraw | echo ""
     if choice < len(folders)
       call ibis#api#select_folder(folders[choice])
       call ibis#api#fetch_all_emails()
@@ -53,11 +64,45 @@ function! ibis#ui#select_profile()
   else
     let choice = nr2char(getchar())
   endif
+  redraw | echo ""
   if choice < len(l:profiles)
-    if choice != 0
-      call ibis#update("ProfileSelect", l:profiles[choice])
-    else
+    if choice == 0
       call ibis#update("ProfileCreate", "")
+    else
+      if ibis#cache#read("profile","") != l:profiles[choice]
+        call ibis#update("ProfileSelect", l:profiles[choice])
+      endif
+    endif
+  else
+    call ibis#utils#elog("Index outside of profile range")
+  endif
+endfunction
+
+function! ibis#ui#delete_profile()
+  let l:profiles = ["CANCEL"] + ibis#profile#list()
+  redraw | echo join(map(copy(l:profiles), "printf('%s (%0d)', v:val, v:key)"), ", ") . ": "
+  if len(l:profiles) > 10
+    let choice = ibis#utils#getnchar(2)
+  else
+    let choice = nr2char(getchar())
+  endif
+  redraw | echo ""
+  if choice < len(l:profiles)
+    if choice == 0
+      return ibis#utils#log("Operation canceled")
+    else
+      let l:current = ibis#cache#read("profile", g:ibis_profile_default)
+      if l:profiles[choice] == l:current
+        return ibis#utils#elog("Can't delete currently loaded profile")
+      else
+        let l:mail = ibis#profile#get_mail(l:profiles[choice])
+        if ibis#ui#prompt_confirm(l:mail) 
+          call ibis#profile#delete(l:profiles[choice])
+          call ibis#utils#log("Profile " . l:profiles[choice] . " deleted")
+        else
+          return ibis#utils#log("Operation canceled")
+        endif
+      endif
     endif
   else
     call ibis#utils#elog("Index outside of profile range")
@@ -270,8 +315,6 @@ function! s:get_max_widths(lines, columns)
     let subject_column_idx = index(s:config["list.to"]["columns"], "subject")
     let max_widths[subject_column_idx] -= diff_width 
   endif
-  echom max_widths
-
   return max_widths
 endfunction
 
