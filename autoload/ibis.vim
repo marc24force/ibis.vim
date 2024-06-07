@@ -8,6 +8,15 @@ let s:state = "Start"
 
 let s:next_profile = g:ibis_profile_default
 
+function! ibis#init(profile)
+  call ibis#utils#dlog("[INIT] = " . a:profile)
+
+  if a:profile != ''
+    let s:next_profile = a:profile
+  endif
+  call ibis#loop()
+endfunction
+
 function! ibis#loop()
   call ibis#utils#dlog("[STATE] = " . s:state)
 

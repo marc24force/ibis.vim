@@ -18,4 +18,4 @@ let g:ibis_emails_chunk_size  = get(g:, "ibis_emails_chunk_size", 50)
 
 
 " COMMANDS
-command! Ibis call ibis#loop()
+command! -nargs=? Ibis call ibis#init(<q-args>)
