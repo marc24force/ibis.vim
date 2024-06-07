@@ -11,7 +11,9 @@ let s:next_profile = g:ibis_profile_default
 function! ibis#init(profile)
   call ibis#utils#dlog("[INIT] = " . a:profile)
 
-  if a:profile != ''
+  if s:state != "Start"
+    return ibis#update("ProfileSelect", a:profile)
+  elseif a:profile != ''
     let s:next_profile = a:profile
   endif
   call ibis#loop()
