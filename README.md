@@ -121,6 +121,7 @@ In Ibis list:
 - ✓ `ps` (profile select: allows to change the current profile, it also allows to create a new one)
 - ✓ `pd` (profile delete: deletes an existing profile)
 - ✗ `pe` (profile edit: modifies an existing profile)
+- ✓ `u`  (update: updates the list of mails to check for new mails)
 - ✗ `<cr>` (enter: open the mail under the cursor)
 - ✗ `mh` (mail html: open the mail under the cursor in an html viewer)
 - ✗ `mw` (mail new: Write a new mail)
