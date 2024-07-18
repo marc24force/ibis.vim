@@ -2,7 +2,7 @@ if exists("b:current_syntax")
   finish
 endif
 
-syntax match ibis_mail          /[a-zA-Z\.\_\-]\+@[a-zA-Z\.\_\-]\+/
+syntax match ibis_mail          /[a-zA-Z0-9\.\_\-]\+@[a-zA-Z0-9\.\_\-]\+/
 syntax match ibis_separator     /|/
 syntax match ibis_table_date    /|\d\d\/\d\d\/\d\d, \d\dh\d\d |$/ contains=ibis_table_date,ibis_separator
 syntax match ibis_table_flag    /^|.\{-}|/                        contains=ibis_table_flag,ibis_separator
